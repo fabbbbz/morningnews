@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Card, Icon, Modal } from 'antd';
 import Nav from './Nav'
@@ -35,6 +35,13 @@ function ScreenMyArticles(props) {
     noArticles = <div style={{ marginTop: "30px" }}>No Articles</div>
   }
 
+  useEffect(() => {
+
+    var jsonArrData = ''
+    jsonArrData = JSON.stringify(props.myArticles)
+    console.log(jsonArrData)
+
+  }, [props.myArticles]);
 
   return (
     <div>
