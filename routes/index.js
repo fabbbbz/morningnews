@@ -3,6 +3,7 @@ var router = express.Router();
 var uid2 = require('uid2')
 var bcrypt = require('bcrypt');
 
+var request = require("sync-request");
 var userModel = require('../models/users')
 var wishlistModel = require('../models/wishlist')
 
@@ -88,6 +89,21 @@ router.post('/sign-in', async function (req, res, next) {
   res.json({ result, user, error, token })
 
 
+})
+
+router.get('/get-sources', function (req, res, next) {
+  const requete = request('GET', `https://newsapi.org/v2/sources?language=${req.query.langue}&country=${req.query.country}&apiKey=4bc7ad33bbfb4f63a530eacc4b57d768`)
+  const result = JSON.parse(requete.body);
+  console.log('get-sources result', result)
+  res.json({ sources: result.sources });
+})
+
+router.get('/get-articles', function (req, res, next) {
+  console.log('req.query.id', req.query.id)
+  const requete = request('GET', `https://newsapi.org/v2/top-headlines?sources=${req.query.id}&apiKey=4bc7ad33bbfb4f63a530eacc4b57d768`)
+  const result = JSON.parse(requete.body);
+  console.log('get-articles result', result)
+  res.json({ articles: result.articles });
 })
 
 router.get('/wishlist', async function (req, res, next) {
