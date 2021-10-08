@@ -1,1 +1,1 @@
-web: node app.js
+web: Run --env=production --port=$PORT
