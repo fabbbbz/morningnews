@@ -15,16 +15,14 @@ function ScreenSource(props) {
   const APIResultsLoading = async (lang) => {
     var langue = 'fr'
     var country = 'fr'
-    console.log('APIResultsLoading', lang)
     if (lang == 'en') {
       var langue = 'en'
       var country = 'us'
     }
-    const data = await fetch(`https://newsapi.org/v2/sources?language=${langue}&country=${country}&apiKey=f05fc4c2226c4d45bed57a613ee6a96f`)
-    const body = await data.json()
+    const data = await fetch(`/get-sources?langue=${langue}&country=${country}`)
+    const result = await data.json()
     setLoading(false)
-    setSourceList(body.sources ?? [])
-
+    setSourceList(result.sources ?? [])
   }
 
   useEffect(() => {
