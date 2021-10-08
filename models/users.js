@@ -5,7 +5,10 @@ const userSchema = mongoose.Schema({
     email: String,
     password: String,
     token: String,
-    lang: String
+    lang: {
+        type: String,
+        default: 'fr'
+    }
 })
 
 const userModel = mongoose.model('users', userSchema)

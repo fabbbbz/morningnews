@@ -85,17 +85,20 @@ router.post('/sign-in', async function (req, res, next) {
     }
   }
 
-
   res.json({ result, user, error, token })
 
 
 })
 
+router.get('/wishlist', async function (req, res, next) {
+  var user = await userModel.findOne({ token: req.query.token })
+  const list = await wishlistModel.find({ userId: user._id, lang: req.query.lang })
+  res.json({ result: list })
+});
 
 router.post('/wishlist', async function (req, res, next) {
   var result = false
   var user = await userModel.findOne({ token: req.body.token })
-  console.log(req.body.token)
 
   if (user != null) {
     var newWishlist = new wishlistModel({
@@ -104,6 +107,7 @@ router.post('/wishlist', async function (req, res, next) {
       description: req.body.desc,
       content: req.body.content,
       userId: user._id,
+      lang: req.body.lang
     })
   }
   var wishlistSave = await newWishlist.save()
@@ -111,7 +115,6 @@ router.post('/wishlist', async function (req, res, next) {
   if (wishlistSave.name) {
     result = true
   }
-  console.log(result)
   res.json({ result })
 
 });
@@ -119,10 +122,8 @@ router.post('/wishlist', async function (req, res, next) {
 router.delete('/wishlist', async function (req, res, next) {
   var result = false
   var user = await userModel.findOne({ token: req.body.token })
-  console.log(req.body.token)
   if (user != null) {
     var delDb = await wishlistModel.deleteOne({ title: req.body.title, userId: user._id })
-    console.log(req.body.title,)
     if (delDb.deletedCount == 1) {
       result = true
     }
@@ -131,4 +132,28 @@ router.delete('/wishlist', async function (req, res, next) {
 })
 
 
+router.get('/last-langue', async function (req, res, next) {
+  const token = req.query.token;
+  const user = await userModel.findOne({ token: token });
+  if (user && user.lang) {
+    res.json({ result: true, lang: user.lang })
+  } else {
+    res.json({ result: false, lang: '' })
+  }
+})
+
+router.post('/last-langue', async function (req, res, next) {
+
+  const lang = req.body.lang;
+  if (lang) {
+    const user = await userModel.findOneAndUpdate(
+      { token: req.body.token },
+      { lang: lang })
+    if (user && user.lang) {
+      res.json({ result: true, lang: user.lang })
+      return;
+    }
+  }
+  res.json({ result: false, lang: '' })
+})
 module.exports = router;

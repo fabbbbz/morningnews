@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Redirect, useParams } from 'react-router-dom';
 import './App.css';
 import { Card, Icon, Modal } from 'antd';
 import Nav from './Nav'
@@ -19,10 +19,10 @@ function ScreenArticlesBySource(props) {
 
   useEffect(() => {
     const findArticles = async () => {
-      const data = await fetch(`https://newsapi.org/v2/top-headlines?sources=${id}&apiKey=b32c8b844d1243b1a7998d8228910f50`)
+      const data = await fetch(`https://newsapi.org/v2/top-headlines?sources=${id}&apiKey=f05fc4c2226c4d45bed57a613ee6a96f`)
       const body = await data.json()
       console.log(body)
-      setArticleList(body.articles)
+      setArticleList(body.articles ?? [])
     }
 
     findArticles()
@@ -32,7 +32,6 @@ function ScreenArticlesBySource(props) {
     setVisible(true)
     setTitle(title)
     setContent(content)
-
   }
 
   var handleOk = e => {
@@ -52,16 +51,19 @@ function ScreenArticlesBySource(props) {
     const data = await fetch('/wishlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `title=${article.title}&content=${article.content}&desc=${article.description}&img=${article.urlToImage}&token=${props.token}`
+      body: `title=${article.title}&content=${article.content}&desc=${article.description}&img=${article.urlToImage}&token=${props.token}&lang=${props.selectedLang}`
     })
   }
 
+  if (!props.token) {
+    return <Redirect to='/' />
+  }
   return (
     <div>
       <Nav />
       <div className="Banner" />
       <div className="Card">
-        {articleList.map((article, i) => (
+        {articleList.length !== 0 && articleList.map((article, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'center' }}>
             <Card
               style={{
@@ -116,17 +118,18 @@ function ScreenArticlesBySource(props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    addToWishList: function (article) {
+    addToWishList: function (article, selectedLang) {
       dispatch({
         type: 'addArticle',
-        articleLiked: article
+        articleLiked: article,
+        selectedLang: selectedLang
       })
     }
   }
 }
 
 function mapStateToProps(state) {
-  return { token: state.token }
+  return { token: state.token, selectedLang: state.selectedLang }
 }
 
 export default connect(

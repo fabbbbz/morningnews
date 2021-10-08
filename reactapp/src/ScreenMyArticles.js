@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Redirect } from 'react-router-dom'
 import './App.css';
-import { Card, Icon, Modal } from 'antd';
+import { Card, Icon, Modal, Empty } from 'antd';
 import Nav from './Nav'
 
 import { connect } from 'react-redux'
@@ -8,16 +9,18 @@ import { connect } from 'react-redux'
 const { Meta } = Card;
 
 function ScreenMyArticles(props) {
+  const { myArticles, token, selectedLang, addToWishList, deleteToWishList, resetWishlist } = props
   const [visible, setVisible] = useState(false)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [lang, setLang] = useState(selectedLang)
 
   var delArticle = async (title) => {
-    props.deleteToWishList(title)
+    deleteToWishList(title)
     const data = await fetch('/wishlist', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `title=${title}&token=${props.token}`
+      body: `title=${title}&token=${token}`
     })
   }
 
@@ -29,33 +32,75 @@ function ScreenMyArticles(props) {
   }
 
   var handleOk = e => {
-    console.log(e)
     setVisible(false)
   }
 
   var handleCancel = e => {
-    console.log(e)
     setVisible(false)
   }
 
   var noArticles
-  if (props.myArticles == 0) {
-    noArticles = <div style={{ marginTop: "30px" }}>No Articles</div>
+  if (myArticles == 0) {
+    noArticles = <Empty
+      image={Empty.PRESENTED_IMAGE_SIMPLE}
+      description={
+        <span>
+          No articles
+        </span>
+      } />
   }
 
+  const loadWishlist = async () => {
+
+    resetWishlist()
+    await fetch(`/wishlist?token=${token}&lang=${lang}`)
+      .then(response => response.json())
+      .then(data => data.result.forEach((article) => {
+        addToWishList(article)
+      }))
+  }
+
+  useEffect(() => {
+    loadWishlist()
+  }, [lang])
+
+  useEffect(() => {
+    loadWishlist()
+  }, [])
+
+  const getStyle = (isSelected) => {
+    var style = {
+      cursor: 'pointer',
+      width: '40px',
+      margin: '10px'
+    }
+    if (isSelected) {
+      style.transform = 'scale(1.1, 1.1)';
+      style.border = '1px white solid ';
+      style.borderRadius = '50%';
+    }
+    return style
+  }
+  if (!token) {
+    return <Redirect to='/' />
+  }
   return (
     <div>
 
       <Nav />
 
-      <div className="Banner" />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} className="Banner" >
+        <img key='fr' style={getStyle('fr' === lang)} src='/images/fr.png' onClick={() => { setLang('fr') }} />
+        <img key='uk' style={getStyle('en' === lang)} src='/images/uk.png' onClick={() => { setLang('en') }} />
+
+      </div>
 
       {noArticles}
 
       <div className="Card">
 
 
-        {props.myArticles.map((article, i) => (
+        {myArticles.map((article, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'center' }}>
 
             <Card
@@ -101,7 +146,7 @@ function ScreenMyArticles(props) {
 }
 
 function mapStateToProps(state) {
-  return { myArticles: state.wishList, token: state.token }
+  return { myArticles: state.wishList, token: state.token, selectedLang: state.selectedLang }
 }
 
 function mapDispatchToProps(dispatch) {
@@ -111,7 +156,19 @@ function mapDispatchToProps(dispatch) {
         type: 'deleteArticle',
         title: articleTitle
       })
-    }
+    },
+    addToWishList: function (article, lang) {
+      dispatch({
+        type: 'addArticle',
+        articleLiked: article,
+        lang
+      })
+    },
+    resetWishlist: function () {
+      dispatch({
+        type: 'resetWishlist'
+      })
+    },
   }
 }
 
