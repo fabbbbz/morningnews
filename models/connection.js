@@ -1,16 +1,21 @@
 var mongoose = require('mongoose');
+const creds = require('./creds.js')
 
 var options = {
     connectTimeoutMS: 5000,
-    useUnifiedTopology : true,
     useNewUrlParser: true,
+    useUnifiedTopology: true
 }
-
-mongoose.connect('mongodb+srv://david:hgm4lRQq8QM1p3P8@cluster0-9xbpy.mongodb.net/morningnews?retryWrites=true&w=majority',
+mongoose.connect(`mongodb+srv://${creds.user}:${creds.password}@cluster0.osztx.mongodb.net/morningnews?retryWrites=true&w=majority`
+    ,
     options,
-    function(err){
-        console.log(err);
+    function (err) {
+        if (err == null) {
+            console.log("===>> Connection Database successfull <<===")
+        } else { console.log(err) }
+
     }
-)
+
+);
 
 module.exports = mongoose
