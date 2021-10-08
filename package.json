@@ -15,5 +15,18 @@
     "mongoose": "^6.0.9",
     "morgan": "~1.9.1",
     "uid2": "^1.0.0"
-  }
+  },
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabbbbz/morningnews.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fabbbbz/morningnews/issues"
+  },
+  "homepage": "https://github.com/fabbbbz/morningnews#readme",
+  "description": ""
 }
