@@ -20,7 +20,7 @@ function ScreenSource(props) {
       var langue = 'en'
       var country = 'us'
     }
-    const data = await fetch(`https://newsapi.org/v2/sources?language=${langue}&country=${country}&apiKey=f05fc4c2226c4d45bed57a613ee6a96f`)
+    const data = await fetch(`https://newsapi.org/v2/sources?language=${langue}&country=${country}&apiKey=4bc7ad33bbfb4f63a530eacc4b57d768`)
     const body = await data.json()
     setLoading(false)
     setSourceList(body.sources ?? [])
